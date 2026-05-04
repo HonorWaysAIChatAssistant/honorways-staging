@@ -1,379 +1,301 @@
-<!doctype html>
-<html lang="nl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0b5ed7" />
-    <title>Honorways AI Assistant (Mobile Test)</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Honorways AI Assistant</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #eef2f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-    <style>
-      :root {
-        --bg: #eef2f7;
-        --panel: #dfe1e5;
-        --header: #0b5ed7;
-        --primary: #1f6fe5;
-        --text: #111;
-        --bubble-bot: #d3d4d8;
-      }
+    .chat-container {
+      width: 95%;
+      max-width: 900px;
+      height: 92vh;
+      background: #dfe1e5;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
 
-      * {
-        box-sizing: border-box;
-      }
+    .chat-header {
+      background: #0b5ed7;
+      color: white;
+      text-align: center;
+      padding: 18px;
+      font-size: 24px;
+      font-weight: bold;
+    }
 
-      body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        min-height: 100dvh;
-        display: grid;
-        place-items: center;
-        padding:
-          env(safe-area-inset-top)
-          max(10px, env(safe-area-inset-right))
-          env(safe-area-inset-bottom)
-          max(10px, env(safe-area-inset-left));
-      }
+    .chat-box {
+      flex: 1;
+      padding: 18px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
 
+    .message {
+      max-width: 78%;
+      padding: 16px 20px;
+      border-radius: 22px;
+      line-height: 1.4;
+      font-size: 18px;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: #1f6fe5;
+      color: white;
+      border-bottom-right-radius: 8px;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background: #d3d4d8;
+      color: black;
+      border-bottom-left-radius: 8px;
+    }
+
+    .input-area {
+      display: flex;
+      padding: 14px;
+      background: #dfe1e5;
+      gap: 12px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+
+    input {
+      flex: 1;
+      padding: 18px;
+      border-radius: 30px;
+      border: none;
+      font-size: 18px;
+      outline: none;
+    }
+
+    button {
+      padding: 16px 28px;
+      border: none;
+      border-radius: 30px;
+      background: #1f6fe5;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .typing {
+      opacity: 0.7;
+      font-style: italic;
+    }
+
+    @media (max-width: 768px) {
       .chat-container {
-        width: min(900px, 100%);
-        height: min(92dvh, 100dvh);
-        background: var(--panel);
-        border-radius: 24px;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-      }
-
-      .chat-header {
-        background: var(--header);
-        color: #fff;
-        text-align: center;
-        padding: 16px 14px;
-        font-size: 22px;
-        font-weight: 800;
-        line-height: 1.2;
-      }
-
-      .chat-box {
-        flex: 1;
-        padding: 14px;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
       }
 
       .message {
-        max-width: 85%;
-        padding: 12px 14px;
-        border-radius: 20px;
-        line-height: 1.35;
-        font-size: 16px;
-        word-break: break-word;
-        white-space: pre-wrap;
+        max-width: 88%;
+        font-size: 17px;
       }
 
-      .user {
-        align-self: flex-end;
-        background: var(--primary);
-        color: #fff;
-        border-bottom-right-radius: 8px;
+      .chat-header {
+        font-size: 20px;
       }
+    }
+  </style>
+</head>
+<body>
 
-      .bot {
-        align-self: flex-start;
-        background: var(--bubble-bot);
-        color: #000;
-        border-bottom-left-radius: 8px;
-      }
+  <div class="chat-container">
+    <div class="chat-header">Honorways AI Assistant(Demo)</div>
 
-      .typing {
-        opacity: 0.75;
-        font-style: italic;
-      }
+    <div class="chat-box" id="chatBox"></div>
 
-      .input-area {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px;
-        background: var(--panel);
-        border-top: 1px solid rgba(0, 0, 0, 0.08);
-      }
-
-      input {
-        flex: 1;
-        min-height: 44px;
-        padding: 10px 14px;
-        border-radius: 22px;
-        border: none;
-        font-size: 16px;
-        outline: none;
-      }
-
-      button {
-        min-height: 44px;
-        min-width: 84px;
-        padding: 0 16px;
-        border: none;
-        border-radius: 22px;
-        background: var(--primary);
-        color: #fff;
-        font-size: 16px;
-        font-weight: 800;
-        cursor: pointer;
-        touch-action: manipulation;
-      }
-
-      button:disabled {
-        opacity: 0.55;
-        cursor: not-allowed;
-      }
-
-      @media (max-width: 768px) {
-        .chat-container {
-          width: 100%;
-          height: 100dvh;
-          border-radius: 0;
-        }
-
-        .message {
-          max-width: 90%;
-        }
-
-        .chat-header {
-          font-size: 18px;
-          padding: 12px 10px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="chat-container">
-      <div class="chat-header">Honorways AI Assistant (Mobile Test)</div>
-
-      <div class="chat-box" id="chatBox" aria-live="polite" aria-relevant="additions"></div>
-
-      <div class="input-area">
-        <label class="sr-only" for="userInput">Your message</label>
-        <input id="userInput" type="text" inputmode="text" enterkeyhint="send" autocomplete="off" placeholder="Type your message..." />
-        <button id="sendBtn" type="button">Send</button>
-      </div>
+    <div class="input-area">
+      <input
+        type="text"
+        id="userInput"
+        placeholder="Type your message..."
+        onkeypress="handleKeyPress(event)"
+      />
+      <button onclick="sendMessage()">Send</button>
     </div>
+  </div>
 
-    <style>
-      .sr-only {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
+  <script>
+    // 🔧 REPLACE WITH YOUR MAKE WEBHOOK URL
+    const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
+
+    const chatBox = document.getElementById("chatBox");
+    const userInput = document.getElementById("userInput");
+
+    function addMessage(text, sender, isTyping = false) {
+      const msg = document.createElement("div");
+      msg.classList.add("message", sender);
+
+      if (isTyping) {
+        msg.classList.add("typing");
       }
-    </style>
 
-    <script>
-      // Replace when publishing the test page.
-      const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
+      msg.textContent = text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
 
-      const chatBox = document.getElementById("chatBox");
-      const userInput = document.getElementById("userInput");
-      const sendBtn = document.getElementById("sendBtn");
+      return msg;
+    }
+let customerName = localStorage.getItem("customerName") || "";
+let nameAttempted = localStorage.getItem("nameAttempted") || "false";
+function isLikelyName(input) {
+    const trimmed = input.trim();
 
+    // Reject question-like entries
+    if (trimmed.includes("?")) return false;
+
+    // Split into words
+    const words = trimmed.split(/\s+/);
+
+    // Must be 1–2 words only
+    if (words.length < 1 || words.length > 2) return false;
+
+    // Prevent very long entries
+    if (trimmed.length > 25) return false;
+
+    // Letters only (supports apostrophes, hyphens)
+    return /^[A-Za-z\s'-]+$/.test(trimmed);
+}    
+    function handleKeyPress(event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    }
+
+    async function sendMessage() {
+      const message = userInput.value.trim();
       const SESSION_TIMEOUT = 60 * 60 * 1000; // 1 hour
-      const FETCH_TIMEOUT_MS = 15000;
-      const LONG_WAIT_HINT_MS = 3500;
+      const now = Date.now();
 
-      let customerName = localStorage.getItem("customerName") || "";
-      let nameAttempted = localStorage.getItem("nameAttempted") || "false";
+      const lastActivity = localStorage.getItem("lastActivity");
 
-      let isSending = false;
-      let longWaitTimer = null;
-
-      function addMessage(text, sender, isTyping = false) {
-        const msg = document.createElement("div");
-        msg.classList.add("message", sender);
-        if (isTyping) msg.classList.add("typing");
-        msg.textContent = text;
-        chatBox.appendChild(msg);
-        scrollToBottomIfNearEnd();
-        return msg;
+      if (!lastActivity || now - parseInt(lastActivity) > SESSION_TIMEOUT) {
+      localStorage.removeItem("customerName");
+      localStorage.removeItem("nameAttempted");
+      customerName = "";
       }
 
-      function isNearBottom(thresholdPx = 140) {
-        return chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight < thresholdPx;
-      }
+      localStorage.setItem("lastActivity", now);
+      if (!message) return;
+// NAME CAPTURE LOGIC START
+if (!customerName) {
 
-      function scrollToBottomIfNearEnd() {
-        if (isNearBottom()) chatBox.scrollTop = chatBox.scrollHeight;
-      }
+    const extractedName = extractNameFromMessage(message);
 
-      function isLikelyName(input) {
-        const trimmed = input.trim();
-        if (!trimmed || trimmed.includes("?")) return false;
+    if (extractedName) {
+        customerName = extractedName;
+        localStorage.setItem("customerName", customerName);
+        localStorage.removeItem("nameAttempted");
+        nameAttempted = "false";
+    }
 
-        const words = trimmed.split(/\s+/);
-        if (words.length < 1 || words.length > 2) return false;
-        if (trimmed.length > 25) return false;
-
-        return /^[A-Za-z\s'-]+$/.test(trimmed);
-      }
-
-      function refreshSession() {
-        const now = Date.now();
-        const lastActivity = Number(localStorage.getItem("lastActivity") || 0);
-
-        if (!lastActivity || now - lastActivity > SESSION_TIMEOUT) {
-          localStorage.removeItem("customerName");
-          localStorage.removeItem("nameAttempted");
-          customerName = "";
-          nameAttempted = "false";
-        }
-
-        localStorage.setItem("lastActivity", String(now));
-      }
-
-      function clearLongWaitTimer() {
-        if (longWaitTimer) {
-          clearTimeout(longWaitTimer);
-          longWaitTimer = null;
-        }
-      }
-
-      async function sendMessage() {
-        refreshSession();
-
-        const message = userInput.value.trim();
-        if (!message) return;
-        if (isSending) return;
-
-        // Optional: keep Enter-to-send, allow Shift+Enter for newline (common mobile expectation)
-        // If you don't want newlines at all, remove this block and keep Enter-to-send only.
-        // (Handled in keydown listener below.)
-
-        // NAME CAPTURE LOGIC START
-        if (!customerName) {
-          if (isLikelyName(message)) {
-            addMessage(message, "user");
-            customerName = message.trim();
-            localStorage.setItem("customerName", customerName);
-            localStorage.removeItem("nameAttempted");
-            nameAttempted = "false";
-
-            addMessage(`Hallo ${customerName}! 😊 Hoe kan ik u van dienst zijn?`, "bot");
-            userInput.value = "";
-            return;
-          }
-
-          if (nameAttempted !== "true") {
-            localStorage.setItem("nameAttempted", "true");
-            nameAttempted = "true";
-            addMessage(
-              "Een voornaam helpt mij u beter te helpen 😊 Mag ik uw voornaam? Als u die liever niet deelt, is dat ook prima.",
-              "bot"
-            );
-            userInput.value = "";
-            return;
-          }
-
-          customerName = "Unknown";
-          localStorage.setItem("customerName", customerName);
-          addMessage("Geen probleem 😊 Ik help u graag verder. Waarmee kan ik u helpen?", "bot");
-        }
-        // NAME CAPTURE LOGIC END
-
-        isSending = true;
-        sendBtn.disabled = true;
-
+    else if (isLikelyName(message)) {
         addMessage(message, "user");
+        customerName = message.trim();
+        localStorage.setItem("customerName", customerName);
+        localStorage.removeItem("nameAttempted");
+        nameAttempted = "false";
+
+        addMessage(`Hallo ${customerName}! 😊 Hoe kan ik u van dienst zijn?`, "bot");
         userInput.value = "";
+        return;
+    }
 
-        const typingBubble = addMessage("Typing...", "bot", true);
+    if (nameAttempted !== "true") {
+        localStorage.setItem("nameAttempted", "true");
+        nameAttempted = "true";
+        addMessage("Een voornaam helpt mij u beter te helpen 😊 Mag ik uw voornaam? Als u die liever niet deelt, is dat ook prima.", "bot"); 
+        userInput.value = "";
+        return;
+    }
 
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    customerName = "Gast";
+    localStorage.setItem("customerName", customerName);
 
-        clearLongWaitTimer();
-        longWaitTimer = setTimeout(() => {
-          // Only show if still waiting and user is near bottom (less noisy)
-          if (isNearBottom()) {
-            addMessage("Even geduld — op mobiele verbindingen kan dit iets langer duren…", "bot");
-          }
-        }, LONG_WAIT_HINT_MS);
+    addMessage("Geen probleem 😊 Ik help u graag verder. Waarmee kan ik u van dienst zijn?", "bot");
+}
+// NAME CAPTURE LOGIC END
+      console.log("SEND FUNCTION TRIGGERED");
+      addMessage(message, "user");
+      userInput.value = "";
+
+      const typingBubble = addMessage("Typing...", "bot", true);
+
+      try {
+        console.log("Sending to webhook:", message);
+
+        const response = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+               name: customerName,
+               message: message
+          })
+        });
+
+        const rawText = await response.text();
+        console.log("RAW RESPONSE:", rawText);
+
+        let reply = "";
 
         try {
-          if (!WEBHOOK_URL || WEBHOOK_URL.includes("REPLACE_WITH_YOUR_WEBHOOK_URL")) {
-            throw new Error("Missing WEBHOOK_URL");
-          }
+          const data = JSON.parse(rawText);
+          console.log("PARSED DATA:", data);
 
-          const response = await fetch(WEBHOOK_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message })
-            signal: controller.signal
-          });
-
-          const rawText = await response.text();
-          let reply = "";
-
-          try {
-            const data = JSON.parse(rawText);
-            reply = data.reply || data.result || data.response || "No reply received from AI.";
-          } catch {
-            reply = rawText || "Error connecting to AI.";
-          }
-
-          typingBubble.remove();
-          addMessage(reply, "bot");
-        } catch (error) {
-          console.error("FETCH ERROR:", error);
-          typingBubble.remove();
-
-          const msg =
-            error && error.name === "AbortError"
-              ? "De verbinding duurde te lang. Probeer het opnieuw."
-              : "Error connecting to AI.";
-          addMessage(msg, "bot");
-        } finally {
-          clearTimeout(timeout);
-          clearLongWaitTimer();
-          isSending = false;
-          sendBtn.disabled = false;
-          scrollToBottomIfNearEnd();
-          userInput.focus();
+          reply =
+            data.reply ||
+            data.result ||
+            data.response ||
+            "No reply received from AI.";
+        } catch (jsonError) {
+          console.log("JSON parse failed, using raw text.");
+          reply = rawText || "Error connecting to AI.";
         }
+
+        typingBubble.remove();
+        addMessage(reply, "bot");
+
+      } catch (error) {
+        console.error("FETCH ERROR:", error);
+        typingBubble.remove();
+        addMessage("Error connecting to AI.", "bot");
       }
+    }
 
-      sendBtn.addEventListener("click", sendMessage);
+    // Optional welcome message
+    window.onload = () => {
+      addMessage("Hallo 😊 Ik ben de AI assistent van JoBeth Salon en LoveFaithHope Apartments. Mag ik eerst uw voornaam zodat ik u beter kan helpen?", "bot");
+    };
+  </script>
 
-      userInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" && !event.shiftKey) {
-          event.preventDefault();
-          sendMessage();
-        }
-      });
-
-      window.addEventListener("load", () => {
-        refreshSession();
-
-        if (customerName && customerName !== "Unknown") {
-          addMessage(`Welkom terug ${customerName}! 😊 Waarmee kan ik u helpen?`, "bot");
-        } else {
-          addMessage(
-            "Hallo 😊 Ik ben de AI assistent van JoBeth Salon en LoveFaithHope Apartments. Mag ik eerst uw voornaam zodat ik u beter kan helpen?",
-            "bot"
-          );
-        }
-
-        userInput.focus();
-      });
-    </script>
-  </body>
+</body>
 </html>
