@@ -1,0 +1,126 @@
+<script>
+  // NOTE: In production, proxy this via your backend (don't expose real webhook publicly)
+  const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
+
+  const chatBox = document.getElementById("chatBox");
+  const userInput = document.getElementById("userInput");
+
+  const SESSION_TIMEOUT = 60 * 60 * 1000; // 1 hour
+
+  let customerName = localStorage.getItem("customerName") || "";
+  let nameAttempted = localStorage.getItem("nameAttempted") || "false";
+
+  function addMessage(text, sender, isTyping = false) {
+    const msg = document.createElement("div");
+    msg.classList.add("message", sender);
+    if (isTyping) msg.classList.add("typing");
+    msg.textContent = text;
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    return msg;
+  }
+
+  function isLikelyName(input) {
+    const trimmed = input.trim();
+    if (!trimmed || trimmed.includes("?")) return false;
+
+    const words = trimmed.split(/\s+/);
+    if (words.length < 1 || words.length > 2) return false;
+    if (trimmed.length > 25) return false;
+
+    return /^[A-Za-z\s'-]+$/.test(trimmed);
+  }
+
+  function refreshSession() {
+    const now = Date.now();
+    const lastActivity = Number(localStorage.getItem("lastActivity") || 0);
+
+    if (!lastActivity || now - lastActivity > SESSION_TIMEOUT) {
+      localStorage.removeItem("customerName");
+      localStorage.removeItem("nameAttempted");
+      customerName = "";
+      nameAttempted = "false";
+    }
+
+    localStorage.setItem("lastActivity", String(now));
+  }
+
+  async function sendMessage() {
+    refreshSession();
+
+    const message = userInput.value.trim();
+    if (!message) return;
+
+    // Name capture flow
+    if (!customerName) {
+      if (isLikelyName(message)) {
+        addMessage(message, "user");
+        customerName = message.trim();
+        localStorage.setItem("customerName", customerName);
+        localStorage.removeItem("nameAttempted");
+        nameAttempted = "false";
+
+        addMessage(`Hallo ${customerName}! 😊 Hoe kan ik u van dienst zijn?`, "bot");
+        userInput.value = "";
+        return;
+      }
+
+      if (nameAttempted !== "true") {
+        nameAttempted = "true";
+        localStorage.setItem("nameAttempted", "true");
+        addMessage("Een voornaam helpt mij u beter te helpen 😊 Mag ik uw voornaam? Als u die liever niet deelt, is dat ook prima.", "bot");
+        userInput.value = "";
+        return;
+      }
+
+      customerName = "Unknown";
+      localStorage.setItem("customerName", customerName);
+      addMessage("Geen probleem 😊 Ik help u graag verder. Waarmee kan ik u helpen?", "bot");
+      // Continue and send current message anyway
+    }
+
+    addMessage(message, "user");
+    userInput.value = "";
+
+    const typingBubble = addMessage("Typing...", "bot", true);
+
+    try {
+      const response = await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: customerName, message })
+      });
+
+      const rawText = await response.text();
+      let reply = "";
+
+      try {
+        const data = JSON.parse(rawText);
+        reply = data.reply || data.result || data.response || "No reply received from AI.";
+      } catch {
+        reply = rawText || "Error connecting to AI.";
+      }
+
+      typingBubble.remove();
+      addMessage(reply, "bot");
+    } catch (error) {
+      console.error("FETCH ERROR:", error);
+      typingBubble.remove();
+      addMessage("Error connecting to AI.", "bot");
+    }
+  }
+
+  userInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") sendMessage();
+  });
+
+  window.addEventListener("load", () => {
+    refreshSession();
+
+    if (customerName && customerName !== "Unknown") {
+      addMessage(`Welkom terug ${customerName}! 😊 Waarmee kan ik u helpen?`, "bot");
+    } else {
+      addMessage("Hallo 😊 Ik ben de AI assistent van JoBeth Salon en LoveFaithHope Apartments. Mag ik eerst uw voornaam zodat ik u beter kan helpen?", "bot");
+    }
+  });
+</script>
