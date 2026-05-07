@@ -127,7 +127,7 @@
 <body>
 
   <div class="chat-container">
-    <div class="chat-header">Honorways AI Assistant(Demo)</div>
+    <div class="chat-header">Jobeth Salon AI Assistant(Demo)</div>
 
     <div class="chat-box" id="chatBox"></div>
 
@@ -183,26 +183,6 @@ function isLikelyName(input) {
     // Letters only (supports apostrophes, hyphens)
     return /^[A-Za-z\s'-]+$/.test(trimmed);
 }    
-  
-function extractNameFromMessage(input) {
-    const patterns = [
-        /mijn naam is\s+([A-Za-zÀ-ÿ'-]+)/i,
-        /ik ben\s+([A-Za-zÀ-ÿ'-]+)/i,
-        /my name is\s+([A-Za-zÀ-ÿ'-]+)/i,
-        /i am\s+([A-Za-zÀ-ÿ'-]+)/i,
-        /i'm\s+([A-Za-zÀ-ÿ'-]+)/i
-    ];
-
-    for (const pattern of patterns) {
-        const match = input.match(pattern);
-        if (match && match[1]) {
-            return match[1].trim();
-        }
-    }
-
-    return "";
-}
-
     function handleKeyPress(event) {
       if (event.key === "Enter") {
         sendMessage();
@@ -227,16 +207,7 @@ function extractNameFromMessage(input) {
 // NAME CAPTURE LOGIC START
 if (!customerName) {
 
-    const extractedName = extractNameFromMessage(message);
-
-    if (extractedName) {
-        customerName = extractedName;
-        localStorage.setItem("customerName", customerName);
-        localStorage.removeItem("nameAttempted");
-        nameAttempted = "false";
-    }
-
-    else if (isLikelyName(message)) {
+    if (isLikelyName(message)) {
         addMessage(message, "user");
         customerName = message.trim();
         localStorage.setItem("customerName", customerName);
@@ -251,15 +222,15 @@ if (!customerName) {
     if (nameAttempted !== "true") {
         localStorage.setItem("nameAttempted", "true");
         nameAttempted = "true";
-        addMessage("Een voornaam helpt mij u beter te helpen 😊 Mag ik uw voornaam? Als u die liever niet deelt, is dat ook prima.", "bot"); 
+        addMessage("A first name helps me assist you better 😊 May I have your first name? If you'd rather not share, that's okay too.", "bot");
         userInput.value = "";
         return;
     }
 
-    customerName = "Gast";
+    customerName = "Unknown";
     localStorage.setItem("customerName", customerName);
 
-    addMessage("Geen probleem 😊 Ik help u graag verder. Waarmee kan ik u van dienst zijn?", "bot");
+    addMessage("Geen probleem 😊 Ik help u graag verder. Waarmee kan ik u helpen?", "bot");
 }
 // NAME CAPTURE LOGIC END
       console.log("SEND FUNCTION TRIGGERED");
