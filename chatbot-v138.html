@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Honorways AI Assistant v1.38</title>
+  <title>Honorways AI Assistant v1.39</title>
   <style>
     body {
       margin: 0;
@@ -28,10 +28,13 @@
     }
     .footer-branding {
       text-align: center;
-      font-size: 12px;
-      color: #666;
-      padding: 8px;
+      font-size: 13px;
+      color: #4a4a4a;
+      padding: 10px 8px;
       background: #dfe1e5;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      font-weight: 500;
+      letter-spacing: 0.2px;
     }
     .chat-header {
       background: #0b5ed7;
@@ -151,8 +154,8 @@
   }
 
   button {
-    padding: 12px 16px;
-    font-size: 15px;
+    padding: 11px 14px;
+    font-size: 14px;
   }
 
   .footer-branding {
@@ -165,7 +168,7 @@
 <body>
 
   <div class="chat-container">
-    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.38)</div>
+    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.39)</div>
     <div class="chat-box" id="chatBox"></div>
 
     <div class="input-area">
@@ -177,13 +180,13 @@
       />
       <button onclick="sendMessage()">Send</button>
     </div>
-    <div class="footer-branding">Powered by HonorWays | v1.38</div>
+    <div class="footer-branding">Powered by HonorWays | v1.39</div>
   </div>
 
   <script>
     // 🔧 REPLACE WITH YOUR MAKE WEBHOOK URL
     const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
-    const CHATBOT_VERSION = "1.38";
+    const CHATBOT_VERSION = "1.39";
     const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
 
