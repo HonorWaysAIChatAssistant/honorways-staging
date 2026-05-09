@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Honorways AI Assistant v1.37</title>
+  <title>Honorways AI Assistant v1.38</title>
   <style>
     body {
       margin: 0;
@@ -12,13 +12,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
     }
 
     .chat-container {
-      width: 95%;
+      width: min(95%, 900px);
       max-width: 900px;
-      height: 92vh;
+      height: min(92vh, 100%);
       background: #dfe1e5;
       border-radius: 24px;
       display: flex;
@@ -37,8 +37,9 @@
       background: #0b5ed7;
       color: white;
       text-align: center;
-      padding: 18px;
-      font-size: 24px;
+      padding: 16px;
+      font-size: clamp(18px, 2.5vw, 24px);
+      line-height: 1.3;
       font-weight: bold;
     }
 
@@ -77,28 +78,33 @@
 
     .input-area {
       display: flex;
-      padding: 14px;
+      padding: 12px;
       background: #dfe1e5;
-      gap: 12px;
+      gap: 10px;
+      flex-wrap: nowrap;
+      align-items: center;
       border-top: 1px solid rgba(0,0,0,0.08);
     }
 
     input {
       flex: 1;
-      padding: 18px;
+      padding: 14px 16px;
       border-radius: 30px;
       border: none;
-      font-size: 18px;
+      font-size: clamp(16px, 2vw, 18px);
+      min-width: 0;
       outline: none;
     }
 
     button {
-      padding: 16px 28px;
+      padding: 14px 20px;
       border: none;
       border-radius: 30px;
       background: #1f6fe5;
       color: white;
-      font-size: 18px;
+      font-size: clamp(15px, 2vw, 18px);
+      white-space: nowrap;
+      flex-shrink: 0;
       cursor: pointer;
       font-weight: bold;
     }
@@ -112,28 +118,54 @@
       font-style: italic;
     }
 
-    @media (max-width: 768px) {
-      .chat-container {
-        width: 100%;
-        height: 100vh;
-        border-radius: 0;
-      }
+@media (max-width: 768px) {
+  .chat-container {
+    width: 100%;
+    height: 100dvh;
+    border-radius: 0;
+  }
 
-      .message {
-        max-width: 88%;
-        font-size: 17px;
-      }
+  .chat-header {
+    font-size: 18px;
+    padding: 14px;
+  }
 
-      .chat-header {
-        font-size: 20px;
-      }
-    }
+  .chat-box {
+    padding: 12px;
+  }
+
+  .message {
+    max-width: 90%;
+    font-size: 16px;
+    padding: 14px 16px;
+  }
+
+  .input-area {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  input {
+    font-size: 16px;
+    padding: 12px 14px;
+  }
+
+  button {
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+
+  .footer-branding {
+    font-size: 11px;
+    padding: 6px;
+  }
+}
   </style>
 </head>
 <body>
 
   <div class="chat-container">
-    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.37)</div>
+    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.38)</div>
     <div class="chat-box" id="chatBox"></div>
 
     <div class="input-area">
@@ -145,7 +177,7 @@
       />
       <button onclick="sendMessage()">Send</button>
     </div>
-    <div class="footer-branding">Powered by HonorWays | v1.37</div>
+    <div class="footer-branding">Powered by HonorWays | v1.38</div>
   </div>
 
   <script>
