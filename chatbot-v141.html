@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Honorways AI Assistant v1.40</title>
+  <title>Honorways AI Assistant v1.41</title>
   <style>
     body {
       margin: 0;
@@ -25,6 +25,7 @@
       flex-direction: column;
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      position: relative;
     }
     .footer-branding {
       text-align: center;
@@ -35,6 +36,9 @@
       border-top: 1px solid rgba(0,0,0,0.06);
       font-weight: 500;
       letter-spacing: 0.2px;
+      position: sticky;
+      bottom: 0;
+      z-index: 9;
     }
     .chat-header {
       background: #0b5ed7;
@@ -44,6 +48,9 @@
       font-size: clamp(18px, 2.5vw, 24px);
       line-height: 1.3;
       font-weight: bold;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     .chat-box {
@@ -53,6 +60,7 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
+      scroll-behavior: smooth;
     }
 
     .message {
@@ -87,6 +95,9 @@
       flex-wrap: nowrap;
       align-items: center;
       border-top: 1px solid rgba(0,0,0,0.08);
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
     }
 
     input {
@@ -161,6 +172,9 @@
   .footer-branding {
     font-size: 11px;
     padding: 6px;
+    position: sticky;
+    bottom: 0;
+    z-index: 9;
   }
 }
   </style>
@@ -168,7 +182,7 @@
 <body>
 
   <div class="chat-container">
-    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.40)</div>
+    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.41)</div>
     <div class="chat-box" id="chatBox"></div>
 
     <div class="input-area">
@@ -180,13 +194,13 @@
       />
       <button onclick="sendMessage()">Send</button>
     </div>
-    <div class="footer-branding">Powered by HonorWays | v1.40</div>
+    <div class="footer-branding">Powered by HonorWays | v1.41</div>
   </div>
 
   <script>
     // 🔧 REPLACE WITH YOUR MAKE WEBHOOK URL
     const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
-    const CHATBOT_VERSION = "1.40";
+    const CHATBOT_VERSION = "1.41";
     const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
 
@@ -279,6 +293,8 @@ if (!customerName) {
         return;
 
     } else if (nameAttempted !== "true") {
+        addMessage(message, "user");
+        
         localStorage.setItem("nameAttempted", "true");
         nameAttempted = "true";
 
@@ -287,6 +303,7 @@ if (!customerName) {
         return;
 
     } else {
+        addMessage(message, "user");
         customerName = "Gast / Guest";
         localStorage.setItem("customerName", customerName);
         localStorage.removeItem("nameAttempted");
