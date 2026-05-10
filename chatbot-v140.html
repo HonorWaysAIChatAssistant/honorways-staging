@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Honorways AI Assistant v1.39</title>
+  <title>Honorways AI Assistant v1.40</title>
   <style>
     body {
       margin: 0;
@@ -168,7 +168,7 @@
 <body>
 
   <div class="chat-container">
-    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.39)</div>
+    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.40)</div>
     <div class="chat-box" id="chatBox"></div>
 
     <div class="input-area">
@@ -180,13 +180,13 @@
       />
       <button onclick="sendMessage()">Send</button>
     </div>
-    <div class="footer-branding">Powered by HonorWays | v1.39</div>
+    <div class="footer-branding">Powered by HonorWays | v1.40</div>
   </div>
 
   <script>
     // 🔧 REPLACE WITH YOUR MAKE WEBHOOK URL
     const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
-    const CHATBOT_VERSION = "1.39";
+    const CHATBOT_VERSION = "1.40";
     const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
 
@@ -206,24 +206,42 @@
     }
 let customerName = localStorage.getItem("customerName") || "";
 let nameAttempted = localStorage.getItem("nameAttempted") || "false";
-function isLikelyName(input) {
-    const trimmed = input.trim();
+function extractName(input) {
+    let trimmed = input.trim();
 
-    // Reject question-like entries
-    if (trimmed.includes("?")) return false;
+    // Common Dutch + English prefixes
+    const prefixes = [
+        /^my name is\s+/i,
+        /^i am\s+/i,
+        /^mijn naam is\s+/i,
+        /^ik ben\s+/i
+    ];
 
-    // Split into words
+    // Strip recognized prefixes
+    for (const prefix of prefixes) {
+        if (prefix.test(trimmed)) {
+            trimmed = trimmed.replace(prefix, "").trim();
+            break;
+        }
+    }
+
+    // Reject questions
+    if (trimmed.includes("?")) return null;
+
+    // Split words
     const words = trimmed.split(/\s+/);
 
-    // Must be 1–2 words only
-    if (words.length < 1 || words.length > 2) return false;
+    // Allow 1–2 words only
+    if (words.length < 1 || words.length > 2) return null;
 
-    // Prevent very long entries
-    if (trimmed.length > 25) return false;
+    // Prevent overly long entries
+    if (trimmed.length > 25) return null;
 
-    // Letters only (supports apostrophes, hyphens)
-    return /^[A-Za-z\s'-]+$/.test(trimmed);
-}    
+    // Letters, apostrophes, hyphens only
+    if (!/^[A-Za-z\s'-]+$/.test(trimmed)) return null;
+
+    return trimmed;
+}
     function handleKeyPress(event) {
       if (event.key === "Enter") {
         sendMessage();
@@ -247,32 +265,39 @@ function isLikelyName(input) {
       if (!message) return;
 // NAME CAPTURE LOGIC START
 if (!customerName) {
+    const extractedName = extractName(message);
 
-    if (isLikelyName(message)) {
+    if (extractedName) {
         addMessage(message, "user");
-        customerName = message.trim();
+        customerName = extractedName;
         localStorage.setItem("customerName", customerName);
         localStorage.removeItem("nameAttempted");
         nameAttempted = "false";
 
-        addMessage(`Hallo ${customerName}! 😊 Hoe kan ik u van dienst zijn?`, "bot");
+        addMessage(`Leuk uw naam te leren kennen, ${customerName}! 😊 Hoe kan ik u verder helpen?`, "bot");
         userInput.value = "";
         return;
-    }
 
-    if (nameAttempted !== "true") {
+    } else if (nameAttempted !== "true") {
         localStorage.setItem("nameAttempted", "true");
         nameAttempted = "true";
-        addMessage("A first name helps me assist you better 😊 May I have your first name? If you'd rather not share, that's okay too.", "bot");
+
+        addMessage("Sorry 😊 Geef alstublieft alleen uw VOORNAAM / Please only provide your FIRST NAME.", "bot");
+        userInput.value = "";
+        return;
+
+    } else {
+        customerName = "Gast / Guest";
+        localStorage.setItem("customerName", customerName);
+        localStorage.removeItem("nameAttempted");
+        nameAttempted = "false";
+
+        addMessage("Geen probleem 😊 Ik help u graag verder. Waarmee kan ik u helpen?", "bot");
         userInput.value = "";
         return;
     }
-
-    customerName = "Unknown";
-    localStorage.setItem("customerName", customerName);
-
-    addMessage("Geen probleem 😊 Ik help u graag verder. Waarmee kan ik u helpen?", "bot");
 }
+
 // NAME CAPTURE LOGIC END
       console.log("SEND FUNCTION TRIGGERED");
       addMessage(message, "user");
@@ -325,7 +350,7 @@ if (!customerName) {
 
     // Optional welcome message
     window.onload = () => {
-      addMessage("Hallo 😊 Ik ben de AI assistent van JoBeth Salon en LoveFaithHope Apartments. Mag ik eerst uw voornaam zodat ik u beter kan helpen?", "bot");
+      addMessage("Hallo / Hello 😊 Ik ben de AI assistent van JoBeth Salon en LoveFaithHope Apartments. Wat is uw VOORNAAM / FIRST NAME?", "bot");
     };
   </script>
 
