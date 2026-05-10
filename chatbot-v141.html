@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Honorways AI Assistant v1.41</title>
+  <title>Honorways AI Assistant vv1.42</title>
   <style>
     body {
       margin: 0;
@@ -182,7 +182,7 @@
 <body>
 
   <div class="chat-container">
-    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.41)</div>
+    <div class="chat-header">Jobeth Salon AI Assistant (Demo vv1.42)</div>
     <div class="chat-box" id="chatBox"></div>
 
     <div class="input-area">
@@ -194,13 +194,13 @@
       />
       <button onclick="sendMessage()">Send</button>
     </div>
-    <div class="footer-branding">Powered by HonorWays | v1.41</div>
+    <div class="footer-branding">Powered by HonorWays | vv1.42</div>
   </div>
 
   <script>
     // 🔧 REPLACE WITH YOUR MAKE WEBHOOK URL
     const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
-    const CHATBOT_VERSION = "1.41";
+    const CHATBOT_VERSION = "v1.42";
     const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
 
@@ -277,6 +277,24 @@ function extractName(input) {
 
       localStorage.setItem("lastActivity", now);
       if (!message) return;
+      
+// If the visitor was previously logged as Gast / Guest,
+// but later provides a valid name, overwrite the temporary guest name.
+// This keeps Google Sheet logging cleaner for future messages.
+const possibleNameUpdate = extractName(message);
+
+if ((customerName === "Gast / Guest" || customerName === "Unknown") && possibleNameUpdate) {
+    addMessage(message, "user");
+
+    customerName = possibleNameUpdate;
+    localStorage.setItem("customerName", customerName);
+    localStorage.removeItem("nameAttempted");
+    nameAttempted = "false";
+
+    addMessage(`Leuk je naam te leren kennen, ${customerName}! 😊 Hoe kan ik je verder helpen?`, "bot");
+    userInput.value = "";
+    return;
+}
 // NAME CAPTURE LOGIC START
 if (!customerName) {
     const extractedName = extractName(message);
