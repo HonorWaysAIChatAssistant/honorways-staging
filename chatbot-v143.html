@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Honorways AI Assistant vv1.42</title>
+  <title>Honorways AI Assistant v1.43</title>
   <style>
     body {
       margin: 0;
@@ -182,7 +182,7 @@
 <body>
 
   <div class="chat-container">
-    <div class="chat-header">Jobeth Salon AI Assistant (Demo vv1.42)</div>
+    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.43)</div>
     <div class="chat-box" id="chatBox"></div>
 
     <div class="input-area">
@@ -194,13 +194,13 @@
       />
       <button onclick="sendMessage()">Send</button>
     </div>
-    <div class="footer-branding">Powered by HonorWays | vv1.42</div>
+    <div class="footer-branding">Powered by HonorWays | v1.43</div>
   </div>
 
   <script>
     // 🔧 REPLACE WITH YOUR MAKE WEBHOOK URL
     const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
-    const CHATBOT_VERSION = "v1.42";
+    const CHATBOT_VERSION = "v1.43";
     const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
 
@@ -223,36 +223,134 @@ let nameAttempted = localStorage.getItem("nameAttempted") || "false";
 function extractName(input) {
     let trimmed = input.trim();
 
-    // Common Dutch + English prefixes
+    // Name-introduction prefixes.
+    // Add more phrases here later if real chats show new patterns.
+    // Examples:
+    // "Mijn naam is Marco" -> Marco
+    // "Mijn voornaam is Silvio" -> Silvio
+    // "Ik ben Marc, hebben jullie WiFi?" -> Marc
     const prefixes = [
         /^my name is\s+/i,
+        /^my first name is\s+/i,
+        /^first name is\s+/i,
         /^i am\s+/i,
+        /^i'm\s+/i,
         /^mijn naam is\s+/i,
+        /^mijn voornaam is\s+/i,
+        /^voornaam is\s+/i,
         /^ik ben\s+/i
     ];
 
-    // Strip recognized prefixes
+    let prefixFound = false;
+
+    // Strip recognized prefix.
+    // Example: "Ik ben Marco Polo" becomes "Marco Polo".
     for (const prefix of prefixes) {
         if (prefix.test(trimmed)) {
             trimmed = trimmed.replace(prefix, "").trim();
+            prefixFound = true;
+            break;
+        }
+    }
+    // If no prefix was found, only accept a direct 1–2 word name.
+    // This prevents normal questions like "Wat zijn jullie prijzen?"
+    // from being incorrectly treated as a name.
+    if (!prefixFound) {
+    if (trimmed.includes("?")) return null;
+
+    const directWords = trimmed.split(/\s+/).filter(Boolean);
+
+    if (directWords.length < 1 || directWords.length > 2) return null;
+    if (trimmed.length > 25) return null;
+    if (!/^[A-Za-zÀ-ÿ\s'-]+$/.test(trimmed)) return null;
+
+    return trimmed;
+}
+    // If a prefix was found, cut off everything after punctuation.
+    // Example: "Ik ben Marc, hebben jullie WiFi?" becomes "Marc".
+    if (prefixFound) {
+        trimmed = trimmed.split(/[,.!?]/)[0].trim();
+    }
+
+    // Stop words are common question/action words.
+    // If one appears after a name prefix, name extraction stops before that word.
+    // This helps extract "Marco Polo" from:
+    // "Ik ben Marco Polo hebben jullie WiFi?"
+    // You can safely add more words later when real tests show wrong extraction.
+    const stopWords = [
+        "en",
+        "hebben",
+        "heb",
+        "kan",
+        "kun",
+        "kunt",
+        "wil",
+        "willen",
+        "zoek",
+        "zoeken",
+        "vraag",
+        "afspraak",
+        "wifi",
+        "prijzen",
+        "prijs",
+        "kosten",
+        "kost",
+        "appartement",
+        "appartementen",
+        "apartment",
+        "apartments",
+        "massage",
+        "pedicure",
+        "manicure",
+        "boeken",
+        "boeking",
+        "beschikbaar",
+        "beschikbaarheid",
+        "do",
+        "can",
+        "have",
+        "want",
+        "need",
+        "looking",
+        "book",
+        "booking",
+        "price",
+        "prices",
+        "cost",
+        "appointment",
+        "available",
+        "availability"
+    ];
+
+    const words = trimmed.split(/\s+/).filter(Boolean);
+    const nameWords = [];
+
+    for (const word of words) {
+        const cleanWord = word.toLowerCase().replace(/[^a-zà-ÿ'-]/gi, "");
+
+        if (stopWords.includes(cleanWord)) {
+            break;
+        }
+
+        nameWords.push(word);
+
+        // Allow maximum 2 name words.
+        // Examples accepted: "Marc", "Marco Polo", "Mary Ann".
+        if (nameWords.length >= 2) {
             break;
         }
     }
 
-    // Reject questions
-    if (trimmed.includes("?")) return null;
+    trimmed = nameWords.join(" ").trim();
 
-    // Split words
-    const words = trimmed.split(/\s+/);
+    // Reject empty result.
+    if (!trimmed) return null;
 
-    // Allow 1–2 words only
-    if (words.length < 1 || words.length > 2) return null;
-
-    // Prevent overly long entries
+    // Prevent overly long entries.
     if (trimmed.length > 25) return null;
 
-    // Letters, apostrophes, hyphens only
-    if (!/^[A-Za-z\s'-]+$/.test(trimmed)) return null;
+    // Accept letters, accents, apostrophes, hyphens and spaces only.
+    if (!/^[A-Za-zÀ-ÿ\s'-]+$/.test(trimmed)) return null;
 
     return trimmed;
 }
