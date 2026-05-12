@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Honorways AI Assistant v1.43</title>
+  <title>Honorways AI Assistant v1.44</title>
   <style>
     body {
       margin: 0;
@@ -27,6 +27,21 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
       position: relative;
     }
+    .bot-message a,
+    .message.bot a,
+    .ai-message a {
+      color: #0b63ce;
+      text-decoration: underline;
+      font-weight: 600;
+      word-break: break-word;
+}
+
+.bot-message a:hover,
+.message.bot a:hover,
+.ai-message a:hover {
+  text-decoration: none;
+}
+    
     .footer-branding {
       text-align: center;
       font-size: 13px;
@@ -182,7 +197,7 @@
 <body>
 
   <div class="chat-container">
-    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.43)</div>
+    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.44)</div>
     <div class="chat-box" id="chatBox"></div>
 
     <div class="input-area">
@@ -194,16 +209,60 @@
       />
       <button onclick="sendMessage()">Send</button>
     </div>
-    <div class="footer-branding">Powered by HonorWays | v1.43</div>
+    <div class="footer-branding">Powered by HonorWays | v1.44</div>
   </div>
 
   <script>
     // 🔧 REPLACE WITH YOUR MAKE WEBHOOK URL
     const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
-    const CHATBOT_VERSION = "v1.43";
+    const CHATBOT_VERSION = "v1.44";
     const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
 
+    function escapeHtml(text) {
+  if (!text) return "";
+
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function makeBotLinksClickable(text) {
+  if (!text) return "";
+
+  let safeText = escapeHtml(text);
+
+  // Convert Markdown links: [Label](https://example.com)
+  safeText = safeText.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+    function (match, label, url) {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+    }
+  );
+
+  // Convert raw URLs into clickable links
+  safeText = safeText.replace(
+    /(^|[^"'>])(https?:\/\/[^\s<]+)/g,
+    function (match, prefix, url) {
+      let cleanUrl = url;
+      let trailing = "";
+
+      while (/[.,!?)]$/.test(cleanUrl)) {
+        trailing = cleanUrl.slice(-1) + trailing;
+        cleanUrl = cleanUrl.slice(0, -1);
+      }
+
+      return `${prefix}<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${cleanUrl}</a>${trailing}`;
+    }
+  );
+
+  safeText = safeText.replace(/\n/g, "<br>");
+
+  return safeText;
+}
     function addMessage(text, sender, isTyping = false) {
       const msg = document.createElement("div");
       msg.classList.add("message", sender);
@@ -212,7 +271,19 @@
         msg.classList.add("typing");
       }
 
-      msg.textContent = text;
+      const senderName = String(sender || "").toLowerCase();
+
+const isBotMessage =
+  senderName.includes("bot") ||
+  senderName.includes("ai") ||
+  senderName.includes("assistant") ||
+  senderName.includes("received");
+
+if (isBotMessage && !isTyping) {
+  msg.innerHTML = makeBotLinksClickable(text);
+} else {
+  msg.textContent = text;
+}
       chatBox.appendChild(msg);
       chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -371,6 +442,7 @@ function extractName(input) {
       localStorage.removeItem("customerName");
       localStorage.removeItem("nameAttempted");
       customerName = "";
+      nameAttempted = "false";  
       }
 
       localStorage.setItem("lastActivity", now);
