@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Honorways AI Assistant v1.44</title>
+  <title>Honorways AI Assistant v1.46</title>
   <style>
     body {
       margin: 0;
@@ -197,7 +197,7 @@
 <body>
 
   <div class="chat-container">
-    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.44)</div>
+    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.46)</div>
     <div class="chat-box" id="chatBox"></div>
 
     <div class="input-area">
@@ -209,13 +209,13 @@
       />
       <button onclick="sendMessage()">Send</button>
     </div>
-    <div class="footer-branding">Powered by HonorWays | v1.44</div>
+    <div class="footer-branding">Powered by HonorWays | v1.46</div>
   </div>
 
   <script>
     // 🔧 REPLACE WITH YOUR MAKE WEBHOOK URL
     const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
-    const CHATBOT_VERSION = "v1.44";
+    const CHATBOT_VERSION = "v1.46";
     const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
 
@@ -431,23 +431,84 @@ function extractName(input) {
       }
     }
 
+  // v1.46 PATCH — CUSTOMER MEMORY IMPROVEMENTS (19 Mei 2026)  
+  function detectCategory(message) {
+  const text = message.toLowerCase();
+
+  if (
+    text.includes("salon") ||
+    text.includes("massage") ||
+    text.includes("pedicure") ||
+    text.includes("manicure") ||
+    text.includes("facial") ||
+    text.includes("gezicht") ||
+    text.includes("wax") ||
+    text.includes("harsen") ||
+    text.includes("nagel") ||
+    text.includes("nagels") ||
+    text.includes("voet") ||
+    text.includes("voeten") ||
+    text.includes("afspraak") ||
+    text.includes("behandeling")
+  ) {
+    return "salon";
+  }
+
+  if (
+    text.includes("apartment") ||
+    text.includes("appartement") ||
+    text.includes("faith") ||
+    text.includes("love") ||
+    text.includes("hope") ||
+    text.includes("airbnb") ||
+    text.includes("verhuur") ||
+    text.includes("nacht") ||
+    text.includes("nachten") ||
+    text.includes("prijs") ||
+    text.includes("overnachten") ||
+    text.includes("verblijf") ||
+    text.includes("kamer")
+  ) {
+    return "apartments";
+  }
+
+  if (
+    text.includes("boeken") ||
+    text.includes("boeking") ||
+    text.includes("direct") ||
+    text.includes("whatsapp") ||
+    text.includes("prijs") ||
+    text.includes("offerte")
+  ) {
+    return "booking";
+  }
+
+  return "";
+}
     async function sendMessage() {
       const message = userInput.value.trim();
-      const SESSION_TIMEOUT = 60 * 60 * 1000; // 1 hour
+      const SESSION_TIMEOUT = 4 * 60 * 60 * 1000; // 4 hour
       const now = Date.now();
 
       const lastActivity = localStorage.getItem("lastActivity");
 
+      // v1.46 PATCH — Reset customer memory after session timeout
       if (!lastActivity || now - parseInt(lastActivity) > SESSION_TIMEOUT) {
       localStorage.removeItem("customerName");
       localStorage.removeItem("nameAttempted");
+      localStorage.removeItem("lastCategory");
       customerName = "";
       nameAttempted = "false";  
       }
 
       localStorage.setItem("lastActivity", now);
       if (!message) return;
-      
+      // v1.46 PATCH — Store last detected category
+const detectedCategory = detectCategory(message);
+
+if (detectedCategory) {
+    localStorage.setItem("lastCategory", detectedCategory);
+}
 // If the visitor was previously logged as Gast / Guest,
 // but later provides a valid name, overwrite the temporary guest name.
 // This keeps Google Sheet logging cleaner for future messages.
@@ -461,7 +522,15 @@ if ((customerName === "Gast / Guest" || customerName === "Unknown") && possibleN
     localStorage.removeItem("nameAttempted");
     nameAttempted = "false";
 
-    addMessage(`Leuk je naam te leren kennen, ${customerName}! 😊 Hoe kan ik je verder helpen?`, "bot");
+addMessage(`Leuk uw naam te leren kennen, ${customerName}! 😊
+
+Waarmee kan ik u helpen?
+
+1. JoBeth Salon afspraken en diensten
+2. Overige producten of algemene vragen
+3. Love Faith Hope vakantie appartementen
+
+Typ gerust je vraag hieronder.`, "bot");
     userInput.value = "";
     return;
 }
@@ -476,7 +545,15 @@ if (!customerName) {
         localStorage.removeItem("nameAttempted");
         nameAttempted = "false";
 
-        addMessage(`Leuk uw naam te leren kennen, ${customerName}! 😊 Hoe kan ik u verder helpen?`, "bot");
+  addMessage(`Leuk uw naam te leren kennen, ${customerName}! 😊
+  
+  Waarmee kan ik u helpen?
+  
+  1. JoBeth Salon afspraken en diensten
+  2. Overige producten of algemene vragen
+  3. Love Faith Hope vakantie appartementen
+        
+  Typ gerust uw vraag hieronder.`, "bot");
         userInput.value = "";
         return;
 
@@ -497,7 +574,15 @@ if (!customerName) {
         localStorage.removeItem("nameAttempted");
         nameAttempted = "false";
 
-        addMessage("Geen probleem 😊 Ik help u graag verder. Waarmee kan ik u helpen?", "bot");
+    addMessage(`Geen probleem 😊 Ik help u graag verder. 
+        
+    Waarmee kan ik u helpen?
+        
+    1. JoBeth Salon afspraken en diensten
+    2. Overige producten of algemene vragen
+    3. Love Faith Hope vakantie appartementen
+    
+    Typ gerust uw vraag hieronder.`, "bot");     
         userInput.value = "";
         return;
     }
@@ -553,10 +638,36 @@ if (!customerName) {
       }
     }
 
-    // Optional welcome message
-    window.onload = () => {
-      addMessage("Hallo / Hello 😊 Ik ben de AI assistent van JoBeth Salon en LoveFaithHope Apartments. Wat is uw VOORNAAM / FIRST NAME?", "bot");
-    };
+    // v1.46 PATCH — Smart welcome message for returning visitors
+  window.onload = () => {
+  const savedName = localStorage.getItem("customerName");
+  const lastCategory = localStorage.getItem("lastCategory");
+
+  if (savedName && savedName !== "Gast / Guest" && savedName !== "Unknown") {
+    let categoryText = "";
+
+    if (lastCategory === "salon") {
+      categoryText = "Vorige keer had u interesse in JoBeth Salon.";
+    } else if (lastCategory === "apartments") {
+      categoryText = "Vorige keer keek u naar Love Faith Hope Apartments.";
+    } else if (lastCategory === "booking") {
+      categoryText = "Vorige keer had u interesse in boeken of prijzen.";
+    }
+
+    addMessage(`Welkom terug, ${savedName}! 😊
+
+${categoryText ? categoryText + "\n\n" : ""}Waarmee kan ik u verder helpen?
+
+1. JoBeth Salon afspraken en diensten
+2. Overige producten of algemene vragen
+3. Love Faith Hope vakantie appartementen
+
+Typ gerust uw vraag hieronder.`, "bot");
+
+  } else {
+    addMessage("Hallo / Hello 😊 Welkom!\nIk ben de AI assistent van JoBeth Salon en Love Faith Hope Apartments.\nWat is uw VOORNAAM / FIRST NAME?", "bot");
+  }
+};
   </script>
 
 </body>
