@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Honorways AI Assistant v1.46.1</title>
+  <title>Honorways AI Assistant v1.46.1-hotfix</title>
   <style>
     body {
       margin: 0;
@@ -197,7 +197,7 @@
 <body>
 
   <div class="chat-container">
-    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.46.1)</div>
+    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.46.1-hotfix)</div>
     <div class="chat-box" id="chatBox"></div>
 
     <div class="input-area">
@@ -215,7 +215,7 @@
   <script>
     // 🔧 REPLACE WITH YOUR MAKE WEBHOOK URL
     const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
-    const CHATBOT_VERSION = "v1.46.1";
+    const CHATBOT_VERSION = "v1.46.1-hotfix";
     const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
 
@@ -431,7 +431,7 @@ function extractName(input) {
       }
     }
 
-  // v1.46.1 PATCH — CUSTOMER MEMORY IMPROVEMENTS (19 Mei 2026)  
+  // v1.46.1-hotfix PATCH — CUSTOMER MEMORY IMPROVEMENTS (19 Mei 2026)  
   function detectCategory(message) {
   const text = message.toLowerCase();
 
@@ -492,7 +492,7 @@ function extractName(input) {
 
       const lastActivity = localStorage.getItem("lastActivity");
 
-      // v1.46.1 PATCH — Reset customer memory after session timeout
+      // v1.46.1-hotfix PATCH — Reset customer memory after session timeout
       if (!lastActivity || now - parseInt(lastActivity) > SESSION_TIMEOUT) {
       localStorage.removeItem("customerName");
       localStorage.removeItem("nameAttempted");
@@ -503,7 +503,7 @@ function extractName(input) {
 
       localStorage.setItem("lastActivity", now);
       if (!message) return;
-      // v1.46.1 PATCH — Store last detected category
+      // v1.46.1-hotfix PATCH — Store last detected category
 const detectedCategory = detectCategory(message);
 
 if (detectedCategory) {
@@ -638,14 +638,15 @@ if (!customerName) {
       }
     }
 
-    // v1.46.1 PATCH — Smart welcome message for returning visitors
+    // v1.46.1-hotfix PATCH — Smart welcome message for returning visitors
   window.onload = () => {
  
     // v1.46.1 HOTFIX — Validate session immediately on page load
   const now = Date.now();
   const lastActivity = localStorage.getItem("lastActivity");
-
-if (!lastActivity || now - parseInt(lastActivity) > SESSION_TIMEOUT) {
+  const timeout = 4 * 60 * 60 * 1000;
+    
+if (!lastActivity || now - parseInt(lastActivity) > timeout) {
     localStorage.removeItem("customerName");
     localStorage.removeItem("nameAttempted");
     localStorage.removeItem("lastCategory");
