@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Honorways AI Assistant v1.46.1-hotfix</title>
+  <title>Honorways AI Assistant v1.47</title>
   <style>
     body {
       margin: 0;
@@ -155,9 +155,72 @@
   }
 
   .chat-header {
-    font-size: 18px;
-    padding: 14px;
-  }
+    display: flex;
+    align-items: center;
+
+    padding: 12px 16px;
+
+    background: linear-gradient(
+        90deg,
+        #0dbcd7,
+        #005fd8
+    );
+
+    color: white;
+
+    gap: 12px;
+}
+
+.header-logo {
+
+    width: 52px;
+
+    height: 52px;
+
+    border-radius: 50%;
+
+    object-fit: contain;
+
+    background: white;
+
+    padding: 3px;
+
+    flex-shrink: 0;
+}
+
+.header-text {
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    line-height: 1.1;
+}
+
+.header-title {
+
+    font-size: 20px;
+
+    font-weight: bold;
+}
+
+.header-subtitle {
+
+    font-size: 13px;
+
+    opacity: 0.9;
+}
+
+.version {
+
+    font-size: 12px;
+
+    opacity: 0.8;
+
+    margin-left: 6px;
+}
 
   .chat-box {
     padding: 12px;
@@ -197,7 +260,25 @@
 <body>
 
   <div class="chat-container">
-    <div class="chat-header">Jobeth Salon AI Assistant (Demo v1.46.1-hotfix)</div>
+<div class="chat-header">
+
+<img src="assets/jobeth-logo-icon.png"
+class="header-logo"
+alt="JoBeth Salon Logo">
+
+<div class="header-text">
+
+<div class="header-title">
+Jobeth Salon <span class="version">v1.47</span>
+</div>
+
+<div class="header-subtitle">
+AI Beauty Assistant
+</div>
+
+</div>
+
+</div>
     <div class="chat-box" id="chatBox"></div>
 
     <div class="input-area">
@@ -209,13 +290,13 @@
       />
       <button onclick="sendMessage()">Send</button>
     </div>
-    <div class="footer-branding">Powered by HonorWays | v1.46.1</div>
+    <div class="footer-branding">Powered by HonorWays | v1.47</div>
   </div>
 
   <script>
     // 🔧 REPLACE WITH YOUR MAKE WEBHOOK URL
     const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
-    const CHATBOT_VERSION = "v1.46.1-hotfix";
+    const CHATBOT_VERSION = "v1.47-hotfix";
     const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
 
