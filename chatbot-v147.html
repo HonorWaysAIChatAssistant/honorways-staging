@@ -260,10 +260,38 @@
     z-index: 9;
   }
 }
-  </style>
-</head>
-<body>
+ 
+/* Desktop-only header correction */
+@media (min-width: 769px) {
 
+.chat-header{
+padding:18px 16px 14px 16px !important;
+}
+
+.header-logo{
+width:190px !important;
+height:190px !important;
+max-width:190px !important;
+max-height:190px !important;
+}
+
+.header-title{
+font-size:18px !important;
+line-height:1.1 !important;
+}
+
+.header-subtitle{
+font-size:16px !important;
+line-height:1.1 !important;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+ 
   <div class="chat-container">
 <div class="chat-header">
 
