@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Honorways AI Assistant v1.47</title>
+  <title>Honorways AI Assistant v1.48</title>
   <style>
     body {
       margin: 0;
@@ -323,13 +323,13 @@ AI Beauty Assistant
       />
       <button onclick="sendMessage()">Send</button>
     </div>
-    <div class="footer-branding">Powered by HonorWays | v1.47</div>
+    <div class="footer-branding">Powered by HonorWays | v1.48</div>
   </div>
 
   <script>
     // 🔧 REPLACE WITH YOUR MAKE WEBHOOK URL
     const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
-    const CHATBOT_VERSION = "v1.47-hotfix";
+    const CHATBOT_VERSION = "v1.48-hotfix";
     const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
 
@@ -711,7 +711,10 @@ if (!customerName) {
 
       try {
         console.log("Sending to webhook:", message);
-
+      const recentConversation = messages
+      .slice(-6)
+      .map(msg => `${msg.sender === "user" ? "User" : "Assistant"}: ${msg.text}`)
+      .join("\n");
         const response = await fetch(WEBHOOK_URL, {
           method: "POST",
           headers: {
@@ -719,7 +722,8 @@ if (!customerName) {
           },
           body: JSON.stringify({
                name: customerName,
-               message: message
+               message: message,
+               recentConversation: recentConversation
           })
         });
 
