@@ -773,8 +773,7 @@ if (!customerName) {
     // v1.46.1 HOTFIX — Validate session immediately on page load
   const now = Date.now();
   const lastActivity = localStorage.getItem("lastActivity");
-  const timeout = 4 * 60 * 60 * 1000;
-    
+  const timeout = 7 * 24 * 60 * 60 * 1000; // 7 days  
 if (!lastActivity || now - parseInt(lastActivity) > timeout) {
     localStorage.removeItem("customerName");
     localStorage.removeItem("nameAttempted");
