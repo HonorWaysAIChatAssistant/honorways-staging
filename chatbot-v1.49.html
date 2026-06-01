@@ -434,7 +434,7 @@ function startFeedbackTimer() {
       false,
       false
     );
-  }, 8000);
+  }, 18000);
 }
 let customerName = localStorage.getItem("customerName") || "";
 let nameAttempted = localStorage.getItem("nameAttempted") || "false";
@@ -661,6 +661,10 @@ function extractName(input) {
   userInput.value = "";
   return;
 }      
+  if (waitingForRating && !/^[1-5]$/.test(message)) {
+  waitingForRating = false;
+  feedbackPromptShown = false;
+}
       const SESSION_TIMEOUT = 7 * 24 * 60 * 60 * 1000; // 7 days
       const now = Date.now();
 
