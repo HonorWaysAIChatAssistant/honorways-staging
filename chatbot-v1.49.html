@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Honorways AI Assistant v1.48</title>
+  <title>Honorways AI Assistant v1.49</title>
   <style>
     body {
       margin: 0;
@@ -323,13 +323,13 @@ AI Beauty Assistant
       />
       <button onclick="sendMessage()">Send</button>
     </div>
-    <div class="footer-branding">Powered by HonorWays | v1.48</div>
+    <div class="footer-branding">Powered by HonorWays | v1.49</div>
   </div>
 
   <script>
     // 🔧 REPLACE WITH YOUR MAKE WEBHOOK URL
     const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
-    const CHATBOT_VERSION = "v1.48-hotfix";
+    const CHATBOT_VERSION = "v1.49-hotfix";
     const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
 
@@ -378,8 +378,11 @@ function makeBotLinksClickable(text) {
   return safeText;
 }
     let messages = [];
-    function addMessage(text, sender, isTyping = false) {
-      if (!isTyping) {
+    let feedbackTimer = null;
+    let feedbackPromptShown = false;
+    let waitingForRating = false;
+    function addMessage(text, sender, isTyping = false, saveToHistory = true) {
+    if (!isTyping && saveToHistory) {
       messages.push({
       sender: sender,
       text: text
@@ -414,6 +417,25 @@ if (isBotMessage && !isTyping) {
 
       return msg;
     }
+function startFeedbackTimer() {
+  if (feedbackPromptShown || waitingForRating) return;
+
+  if (feedbackTimer) {
+    clearTimeout(feedbackTimer);
+  }
+
+  feedbackTimer = setTimeout(() => {
+    feedbackPromptShown = true;
+    waitingForRating = true;
+
+    addMessage(
+      "Heeft dit uw vraag beantwoord? 😊\nTyp gerust nog een vraag, of beoordeel deze chat van 1 tot 5.",
+      "bot",
+      false,
+      false
+    );
+  }, 8000);
+}
 let customerName = localStorage.getItem("customerName") || "";
 let nameAttempted = localStorage.getItem("nameAttempted") || "false";
 function extractName(input) {
@@ -612,6 +634,33 @@ function extractName(input) {
 }
     async function sendMessage() {
       const message = userInput.value.trim();
+      if (feedbackTimer) {
+      clearTimeout(feedbackTimer);
+      feedbackTimer = null;
+}
+      if (waitingForRating && /^[1-5]$/.test(message)) {
+  addMessage(message, "user", false, false);
+
+  waitingForRating = false;
+  feedbackPromptShown = true;
+
+  let ratingReply = "";
+
+  if (message === "4" || message === "5") {
+    ratingReply =
+      "Dank u wel voor uw beoordeling! 😊\nFijn dat de chat u goed heeft geholpen.\n\nAls u later nog vragen heeft over JoBeth Salon of Love Faith Hope Apartments, helpen wij u graag verder.\nFijne dag verder!";
+  } else if (message === "3") {
+    ratingReply =
+      "Dank u wel voor uw beoordeling 😊\nWe waarderen uw feedback en blijven de service verbeteren.\n\nAls u nog iets wilt vragen of verduidelijken, help ik u graag verder.";
+  } else {
+    ratingReply =
+      "Dank u wel voor uw eerlijke beoordeling.\nJammer dat de chatervaring nog niet helemaal goed was.\n\nAls u wilt, kunt u kort aangeven wat beter kan. U kunt natuurlijk ook direct contact opnemen via de beschikbare boekings- of contactlink.";
+  }
+
+  addMessage(ratingReply, "bot", false, false);
+  userInput.value = "";
+  return;
+}      
       const SESSION_TIMEOUT = 7 * 24 * 60 * 60 * 1000; // 7 days
       const now = Date.now();
 
@@ -759,6 +808,7 @@ if (!customerName) {
 
         typingBubble.remove();
         addMessage(reply, "bot");
+        startFeedbackTimer();
 
       } catch (error) {
         console.error("FETCH ERROR:", error);
