@@ -380,6 +380,7 @@ function makeBotLinksClickable(text) {
     let messages = [];
     let feedbackTimer = null;
     let feedbackPromptShown = false;
+    let waitingForAnswerConfirmation = false;
     let waitingForRating = false;
     function addMessage(text, sender, isTyping = false, saveToHistory = true) {
     if (!isTyping && saveToHistory) {
@@ -418,7 +419,7 @@ if (isBotMessage && !isTyping) {
       return msg;
     }
 function startFeedbackTimer() {
-  if (feedbackPromptShown || waitingForRating) return;
+  if (feedbackPromptShown || waitingForAnswerConfirmation || waitingForRating) return;
 
   if (feedbackTimer) {
     clearTimeout(feedbackTimer);
@@ -426,10 +427,10 @@ function startFeedbackTimer() {
 
   feedbackTimer = setTimeout(() => {
     feedbackPromptShown = true;
-    waitingForRating = true;
+    waitingForAnswerConfirmation = true;
 
     addMessage(
-      "Heeft dit uw vraag beantwoord? 😊\nTyp gerust nog een vraag, of beoordeel deze chat van 1 tot 5.",
+      "Heeft dit uw vraag beantwoord? 😊\nTyp ja of nee, of stel gerust nog een vraag.",
       "bot",
       false,
       false
@@ -638,7 +639,52 @@ function extractName(input) {
       clearTimeout(feedbackTimer);
       feedbackTimer = null;
 }
-      if (waitingForRating && /^[1-5]$/.test(message)) {
+ const lowerMessage = message.toLowerCase();
+
+if (waitingForAnswerConfirmation) {
+  const positiveAnswers = ["ja", "yes", "ok", "okay", "prima", "zeker", "yep", "klopt"];
+  const negativeAnswers = ["nee", "no", "niet echt", "nope"];
+
+  if (positiveAnswers.includes(lowerMessage)) {
+    addMessage(message, "user", false, false);
+
+    waitingForAnswerConfirmation = false;
+    waitingForRating = true;
+
+    addMessage(
+      "Fijn om te horen 😊\nWilt u deze chat beoordelen van 1 tot 5?",
+      "bot",
+      false,
+      false
+    );
+
+    userInput.value = "";
+    return;
+  }
+
+  if (negativeAnswers.includes(lowerMessage)) {
+    addMessage(message, "user", false, false);
+
+    waitingForAnswerConfirmation = false;
+    feedbackPromptShown = false;
+
+    addMessage(
+      "Geen probleem 😊\nStel gerust uw vervolgvraag, dan help ik u verder.",
+      "bot",
+      false,
+      false
+    );
+
+    userInput.value = "";
+    return;
+  }
+
+  // If user asks another real question instead of ja/nee,
+  // continue normal AI flow and allow feedback again later.
+  waitingForAnswerConfirmation = false;
+  feedbackPromptShown = false;
+} 
+  if (waitingForRating && /^[1-5]$/.test(message)) {
   addMessage(message, "user", false, false);
 
   waitingForRating = false;
