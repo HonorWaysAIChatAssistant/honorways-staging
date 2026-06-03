@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Honorways AI Assistant v1.50b</title>
+  <title>Honorways AI Assistant v1.50c</title>
   <style>
     body {
       margin: 0;
@@ -323,13 +323,13 @@ AI Beauty Assistant
       />
       <button onclick="sendMessage()">Send</button>
     </div>
-    <div class="footer-branding">Powered by HonorWays | v1.50b</div>
+    <div class="footer-branding">Powered by HonorWays | v1.50c</div>
   </div>
 
   <script>
     // 🔧 REPLACE WITH YOUR MAKE WEBHOOK URL
     const WEBHOOK_URL = "https://hook.us2.make.com/2gor8kpwlm6gtpmelge4x8xetfzel0iq";
-    const CHATBOT_VERSION = "v1.50b-hotfix";
+    const CHATBOT_VERSION = "v1.50c-hotfix";
     const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
 
@@ -372,12 +372,13 @@ function makeBotLinksClickable(text) {
       return `${prefix}<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${cleanUrl}</a>${trailing}`;
     }
   );
-// v1.50b PATCH — Controlled image markers for visual chatbot responses
+// v1.50c PATCH — Controlled image markers for visual chatbot responses
 // The AI may output markers like [IMAGE:jobeth-services].
 // The frontend maps only approved markers to local GitHub asset files.
   const imageMap = {
   "jobeth-services": "assets/jobeth-services.png",
-  "apartments-main": "assets/LFH_Apartments-main.png"
+  "apartments-main": "assets/LFH_Apartments-main.png",
+  "other-products-main": "assets/other-products-main.png"
 };
 // Convert approved image markers into visible images inside bot messages
 safeText = safeText.replace(
